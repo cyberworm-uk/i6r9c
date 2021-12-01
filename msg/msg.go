@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Msg is a structure which represents a single message received from an IRCd
 type Msg struct {
 	timestamp, nick, user, host, cmd, rcpt, content, args string
 }
@@ -49,6 +50,7 @@ func (m *Msg) Args() string {
 	return m.args
 }
 
+// split will split s around d, returning two strings.
 func split(s, d string) (string, string) {
 	arr := strings.SplitN(s, d, 2)
 	if len(arr) == 2 {
@@ -60,6 +62,7 @@ func split(s, d string) (string, string) {
 	}
 }
 
+// Parse will return a Msg struct pointer, populated with the parsed fields of a single IRC line.
 func Parse(line string) *Msg {
 	m := &Msg{}
 	m.timestamp = time.Now().Format("15:04:05")

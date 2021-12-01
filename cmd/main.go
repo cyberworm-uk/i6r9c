@@ -15,6 +15,7 @@ import (
 	"golang.org/x/term"
 )
 
+// PrintMsg will print out a formatted Msg m to the provided Terminal t.
 func PrintMsg(t *term.Terminal, m *msg.Msg) {
 	var line string
 	switch m.Cmd() {
@@ -86,6 +87,7 @@ func PrintMsg(t *term.Terminal, m *msg.Msg) {
 	t.Write([]byte(line + "\n"))
 }
 
+// setPrompt will update the Terminal prompt with the provided value.
 func setPrompt(t *term.Terminal, prompt string) {
 	t.SetPrompt(fmt.Sprintf("%s%s%s> ",
 		string(t.Escape.Yellow), prompt, string(t.Escape.Reset),

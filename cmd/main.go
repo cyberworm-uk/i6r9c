@@ -16,7 +16,7 @@ import (
 )
 
 // PrintMsg will print out a formatted Msg m to the provided Terminal t.
-func PrintMsg(t *term.Terminal, m *msg.Msg) {
+func printMsg(t *term.Terminal, m *msg.Msg) {
 	var line string
 	switch m.Cmd() {
 	case "PRIVMSG":
@@ -94,6 +94,31 @@ func setPrompt(t *term.Terminal, prompt string) {
 	))
 }
 
+func printUsage(t *term.Terminal) {
+	t.Write([]byte(fmt.Sprintf("%s%s%s %s%s%s %s\n",
+		string(t.Escape.White), "/msg", string(t.Escape.Reset),
+		string(t.Escape.White), "<#channel/recipient>", string(t.Escape.Reset),
+		"[message]",
+	)))
+	t.Write([]byte(fmt.Sprintf("%s%s%s %s%s%s\n",
+		string(t.Escape.White), "/join", string(t.Escape.Reset),
+		string(t.Escape.White), "<#channel>", string(t.Escape.Reset),
+	)))
+	t.Write([]byte(fmt.Sprintf("%s%s%s %s%s%s %s\n",
+		string(t.Escape.White), "/part", string(t.Escape.Reset),
+		string(t.Escape.White), "<#channel>", string(t.Escape.Reset),
+		"[reason]",
+	)))
+	t.Write([]byte(fmt.Sprintf("%s%s%s %s%s%s\n",
+		string(t.Escape.White), "/nick", string(t.Escape.Reset),
+		string(t.Escape.White), "<newnick>", string(t.Escape.Reset),
+	)))
+	t.Write([]byte(fmt.Sprintf("%s%s%s %s\n",
+		string(t.Escape.White), "/quit", string(t.Escape.Reset),
+		"[reason]",
+	)))
+}
+
 func main() {
 	serverPtr := flag.String("server", "ircs://irc.oftc.net:6697/", "URL schema of server, [scheme]://[server]:[port]. irc for non-TLS, ircs for TLS.")
 	proxyPtr := flag.String("proxy", "socks5://127.0.0.1:9050/", "URL schema of proxy, [scheme]://[server]:[port].")
@@ -146,7 +171,7 @@ func main() {
 				if m.Cmd() == "PING" {
 					send <- fmt.Sprintf("PONG :%s", m.Content())
 				} else {
-					PrintMsg(t, m)
+					printMsg(t, m)
 				}
 			}
 		}
@@ -159,33 +184,30 @@ func main() {
 		}
 		if strings.HasPrefix(line, "/") {
 			line = line[1:]
-			arr := strings.SplitN(line, " ", 2)
-			if len(arr) > 1 {
-				line = arr[1]
-			} else {
-				line = ""
-			}
-			switch arr[0] {
+			cmd, line := msg.Split(line, " ")
+			switch cmd {
 			case "msg":
-				arr = strings.SplitN(line, " ", 2)
-				current = arr[0]
+				rcpt, content := msg.Split(line, " ")
+				current = rcpt
 				setPrompt(t, current)
-				if len(arr) > 1 {
-					send <- fmt.Sprintf("PRIVMSG %s :%s", arr[0], arr[1])
+				if len(content) > 1 {
+					send <- fmt.Sprintf("PRIVMSG %s :%s", rcpt, content)
 				}
 			case "join":
-				arr = strings.SplitN(line, " ", 2)
-				current = arr[0]
+				channel, _ := msg.Split(line, " ")
+				current = channel
 				setPrompt(t, current)
-				send <- fmt.Sprintf("JOIN %s", arr[0])
+				send <- fmt.Sprintf("JOIN %s", channel)
 			case "part":
-				arr = strings.SplitN(line, " ", 2)
-				send <- fmt.Sprintf("PART %s", arr[0])
+				channel, content := msg.Split(line, " ")
+				send <- fmt.Sprintf("PART %s :%s", channel, content)
 			case "quit":
 				send <- fmt.Sprintf("QUIT :%s", line)
 				return
 			case "nick":
 				send <- fmt.Sprintf("NICK %s", line)
+			default:
+				printUsage(t)
 			}
 		} else {
 			send <- fmt.Sprintf("PRIVMSG %s :%s", current, line)

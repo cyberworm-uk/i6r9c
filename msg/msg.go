@@ -50,8 +50,8 @@ func (m *Msg) Args() string {
 	return m.args
 }
 
-// split will split s around d, returning two strings.
-func split(s, d string) (string, string) {
+// Split will split s around d, returning two strings.
+func Split(s, d string) (string, string) {
 	arr := strings.SplitN(s, d, 2)
 	if len(arr) == 2 {
 		return arr[0], arr[1]
@@ -68,12 +68,12 @@ func Parse(line string) *Msg {
 	m.timestamp = time.Now().Format("15:04:05")
 	if strings.HasPrefix(line, ":") {
 		line = line[1:]
-		m.host, line = split(line, " ")
-		m.nick, m.host = split(m.host, "!")
-		m.user, m.host = split(m.host, "@")
+		m.host, line = Split(line, " ")
+		m.nick, m.host = Split(m.host, "!")
+		m.user, m.host = Split(m.host, "@")
 	}
-	line, m.content = split(line, " :")
-	m.cmd, line = split(line, " ")
-	m.rcpt, m.args = split(line, " ")
+	line, m.content = Split(line, " :")
+	m.cmd, line = Split(line, " ")
+	m.rcpt, m.args = Split(line, " ")
 	return m
 }

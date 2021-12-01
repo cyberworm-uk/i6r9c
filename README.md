@@ -28,3 +28,7 @@ alternatively, as a container
         	SASL cert and key prefix (I.E foo/bar for foo/bar.crt and foo/bar.key)
       -server string
         	URL schema of server, [scheme]://[server]:[port]. irc for non-TLS, ircs for TLS. (default "ircs://irc.oftc.net:6697/")
+
+only the container file is needed for the build, as it will handle fetching the source internally.
+
+`podman` can be placed with `docker`.

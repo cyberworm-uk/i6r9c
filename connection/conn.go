@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+// Login handles sending the initial login sequence to the remote server, including requesting SASL cert auth if required.
 func Login(send chan<- string, nick string, sasl bool) {
 	if sasl {
 		send <- "CAP REQ :sasl"
@@ -20,6 +21,7 @@ func Login(send chan<- string, nick string, sasl bool) {
 	send <- fmt.Sprintf("USER %s * * :%s", nick, nick)
 }
 
+// Connect will connect to serverAddr, over the proxy at proxyAddr. clientAuthCert will be used as the client certificate auth. tlsVerify will determine if invalid certificates are accepted.
 func Connect(proxyAddr, serverAddr *string, clientAuthCert *tls.Certificate, tlsVerify bool) (net.Conn, error) {
 	proxyUrl, err := url.Parse(*proxyAddr)
 	if err != nil {

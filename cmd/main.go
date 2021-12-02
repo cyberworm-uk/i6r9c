@@ -119,6 +119,22 @@ func printUsage(t *term.Terminal) {
 	)))
 }
 
+func sendMsg(current, content string, send chan<- string) {
+	var frag string
+	for {
+		if len(content) > 0 {
+			if len(content) > 400 {
+				frag, content = content[:400], content[400:]
+			} else {
+				frag, content = content, ""
+			}
+			send <- fmt.Sprintf("PRIVMSG %s :%s", current, frag)
+		} else {
+			return
+		}
+	}
+}
+
 func main() {
 	serverPtr := flag.String("server", "ircs://irc.oftc.net:6697/", "URL schema of server, [scheme]://[server]:[port]. irc for non-TLS, ircs for TLS.")
 	proxyPtr := flag.String("proxy", "socks5://127.0.0.1:9050/", "URL schema of proxy, [scheme]://[server]:[port].")
@@ -191,7 +207,7 @@ func main() {
 				current = rcpt
 				setPrompt(t, current)
 				if len(content) > 1 {
-					send <- fmt.Sprintf("PRIVMSG %s :%s", rcpt, content)
+					sendMsg(current, content, send)
 				}
 			case "join":
 				channel, _ := msg.Split(line, " ")
@@ -210,7 +226,7 @@ func main() {
 				printUsage(t)
 			}
 		} else {
-			send <- fmt.Sprintf("PRIVMSG %s :%s", current, line)
+			sendMsg(current, line, send)
 		}
 	}
 }

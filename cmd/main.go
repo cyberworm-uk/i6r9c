@@ -124,9 +124,11 @@ func sendMsg(current, content string, send chan<- string) {
 	for {
 		if len(content) > 0 {
 			if len(content) > 400 {
-				frag, content = content[:400], content[400:]
+				frag = content[:400]
+				content = content[400:]
 			} else {
-				frag, content = content, ""
+				frag = content
+				content = ""
 			}
 			send <- fmt.Sprintf("PRIVMSG %s :%s", current, frag)
 		} else {
@@ -206,7 +208,7 @@ func main() {
 				rcpt, content := msg.Split(line, " ")
 				current = rcpt
 				setPrompt(t, current)
-				if len(content) > 1 {
+				if len(content) > 0 {
 					sendMsg(current, content, send)
 				}
 			case "join":

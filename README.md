@@ -3,7 +3,7 @@ basic terminal irc client in go, intended for use with tor.
 
 e.g.
 
-    $ go install github.com/guest42069/i6r9c/cmd@v2021.11.30.0
+    $ go install github.com/guest42069/i6r9c/cmd@v2021.11.30.1
     $ ~/go/bin/cmd -h
     Usage of /home/guest42069/go/bin/cmd:
       -nick string

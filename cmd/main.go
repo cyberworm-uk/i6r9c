@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/guest42069/i6r9c/connection"
 	"github.com/guest42069/i6r9c/msg"
@@ -138,6 +139,8 @@ func sendMsg(current, content string, send chan<- string) {
 }
 
 func main() {
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
 	serverPtr := flag.String("server", "ircs://irc.oftc.net:6697/", "URL schema of server, [scheme]://[server]:[port]. irc for non-TLS, ircs for TLS.")
 	proxyPtr := flag.String("proxy", "socks5://127.0.0.1:9050/", "URL schema of proxy, [scheme]://[server]:[port].")
 	nickPtr := flag.String("nick", "", "IRC nickname to use.")
@@ -151,28 +154,32 @@ func main() {
 	if len(*saslPtr) > 0 {
 		cert, err := tls.LoadX509KeyPair(*saslPtr+".crt", *saslPtr+".key")
 		if err != nil {
-			panic(err)
+			fmt.Printf("ERROR: %s\n", err)
+			return
 		}
 		conn, err = connection.Connect(proxyPtr, serverPtr, &cert, true)
 		if err != nil {
-			panic(err)
+			fmt.Printf("ERROR: %s\n", err)
+			return
 		}
 	} else {
 		conn, err = connection.Connect(proxyPtr, serverPtr, nil, true)
 		if err != nil {
-			panic(err)
+			fmt.Printf("ERROR: %s\n", err)
+			return
 		}
 
 	}
-	recv, send, stop := worker.Worker(conn)
+	recv, send, stop := worker.Worker(conn, wg)
 	connection.Login(send, *nickPtr, (len(*saslPtr) > 0))
-	defer close(stop)
 	if !term.IsTerminal(0) || !term.IsTerminal(1) {
-		panic("not a terminal")
+		fmt.Printf("ERROR: not a terminal\n")
+		return
 	}
 	old, err := term.MakeRaw(0)
 	if err != nil {
-		panic(err)
+		fmt.Printf("ERROR: %s\n", err)
+		return
 	}
 	defer term.Restore(0, old)
 	screen := struct {
@@ -198,7 +205,8 @@ func main() {
 	for {
 		line, err := t.ReadLine()
 		if err != nil {
-			panic(err)
+			close(stop)
+			return
 		}
 		if strings.HasPrefix(line, "/") {
 			line = line[1:]
@@ -221,6 +229,7 @@ func main() {
 				send <- fmt.Sprintf("PART %s :%s", channel, content)
 			case "quit":
 				send <- fmt.Sprintf("QUIT :%s", line)
+				close(stop)
 				return
 			case "nick":
 				send <- fmt.Sprintf("NICK %s", line)

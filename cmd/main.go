@@ -72,7 +72,7 @@ func printMsg(t *term.Terminal, m *msg.Msg) {
 		line = fmt.Sprintf("[%s] [%s%s%s] changed renamed to [%s%s%s]",
 			m.Timestamp(),
 			string(t.Escape.Yellow), m.Nick(), string(t.Escape.Reset),
-			string(t.Escape.Red), m.Content(), string(t.Escape.Reset),
+			string(t.Escape.Yellow), m.Content(), string(t.Escape.Reset),
 		)
 	default:
 		line = fmt.Sprintf("[%s] [%s%s%s] [%s%s%s@%s%s%s] %s%s%s [%s%s%s]",

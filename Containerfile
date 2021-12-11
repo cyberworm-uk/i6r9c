@@ -13,4 +13,5 @@ RUN go build -o irc .
 
 FROM gcr.io/distroless/static
 COPY --from=build /go/src/cmd/irc /irc
+USER 1000
 ENTRYPOINT [ "/irc" ]

@@ -7,14 +7,22 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/guest42069/i6r9c/connection"
 	"github.com/guest42069/i6r9c/msg"
 	"github.com/guest42069/i6r9c/worker"
 	"golang.org/x/term"
 )
+
+func updateTerminalSize(t *term.Terminal) {
+	if w, h, err := term.GetSize(int(os.Stdin.Fd())); err != nil {
+		t.SetSize(w, h)
+	}
+}
 
 // PrintMsg will print out a formatted Msg m to the provided Terminal t.
 func printMsg(t *term.Terminal, m *msg.Msg) {
@@ -172,21 +180,28 @@ func main() {
 	}
 	recv, send, stop := worker.Worker(conn, wg)
 	connection.Login(send, *nickPtr, (len(*saslPtr) > 0))
-	if !term.IsTerminal(0) || !term.IsTerminal(1) {
+	if !term.IsTerminal(int(os.Stdin.Fd())) || !term.IsTerminal(int(os.Stdout.Fd())) {
 		fmt.Printf("ERROR: not a terminal\n")
 		return
 	}
-	old, err := term.MakeRaw(0)
+	old, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err)
 		return
 	}
-	defer term.Restore(0, old)
+	defer term.Restore(int(os.Stdin.Fd()), old)
 	screen := struct {
 		io.Reader
 		io.Writer
 	}{os.Stdin, os.Stdout}
 	t := term.NewTerminal(screen, "> ")
+	resizeChan := make(chan os.Signal)
+	go func() {
+		for range resizeChan {
+			updateTerminalSize(t)
+		}
+	}()
+	signal.Notify(resizeChan, syscall.SIGWINCH)
 	go func() {
 		for {
 			select {
@@ -203,6 +218,11 @@ func main() {
 	}()
 	var current string = ""
 	for {
+		select {
+		case <-stop:
+			return
+		default:
+		}
 		line, err := t.ReadLine()
 		if err != nil {
 			close(stop)

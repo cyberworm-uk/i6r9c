@@ -216,48 +216,52 @@ func main() {
 			}
 		}
 	}()
+	lineChan := make(chan string)
+	go func() {
+		if line, err := t.ReadLine(); err != nil {
+			lineChan <- line
+		} else {
+			close(stop)
+			return
+		}
+	}()
 	var current string = ""
 	for {
 		select {
 		case <-stop:
 			return
-		default:
-		}
-		line, err := t.ReadLine()
-		if err != nil {
-			close(stop)
-			return
-		}
-		if strings.HasPrefix(line, "/") {
-			line = line[1:]
-			cmd, line := msg.Split(line, " ")
-			switch cmd {
-			case "msg":
-				rcpt, content := msg.Split(line, " ")
-				current = rcpt
-				setPrompt(t, current)
-				if len(content) > 0 {
-					sendMsg(current, content, send)
+		case line := <-lineChan:
+			if strings.HasPrefix(line, "/") {
+				line = line[1:]
+				cmd, line := msg.Split(line, " ")
+				switch cmd {
+				case "msg":
+					rcpt, content := msg.Split(line, " ")
+					current = rcpt
+					setPrompt(t, current)
+					if len(content) > 0 {
+						sendMsg(current, content, send)
+					}
+				case "join":
+					channel, _ := msg.Split(line, " ")
+					current = channel
+					setPrompt(t, current)
+					send <- fmt.Sprintf("JOIN %s", channel)
+				case "part":
+					channel, content := msg.Split(line, " ")
+					send <- fmt.Sprintf("PART %s :%s", channel, content)
+				case "quit":
+					send <- fmt.Sprintf("QUIT :%s", line)
+					close(stop)
+					return
+				case "nick":
+					send <- fmt.Sprintf("NICK %s", line)
+				default:
+					printUsage(t)
 				}
-			case "join":
-				channel, _ := msg.Split(line, " ")
-				current = channel
-				setPrompt(t, current)
-				send <- fmt.Sprintf("JOIN %s", channel)
-			case "part":
-				channel, content := msg.Split(line, " ")
-				send <- fmt.Sprintf("PART %s :%s", channel, content)
-			case "quit":
-				send <- fmt.Sprintf("QUIT :%s", line)
-				close(stop)
-				return
-			case "nick":
-				send <- fmt.Sprintf("NICK %s", line)
-			default:
-				printUsage(t)
+			} else {
+				sendMsg(current, line, send)
 			}
-		} else {
-			sendMsg(current, line, send)
 		}
 	}
 }

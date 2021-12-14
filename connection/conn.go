@@ -49,8 +49,7 @@ func Connect(proxyAddr, serverAddr *string, clientAuthCert *tls.Certificate, tls
 			cfg.Certificates = append(cfg.Certificates, *clientAuthCert)
 		}
 		tlsConn := tls.Client(conn, cfg)
-		err = tlsConn.Handshake()
-		if err != nil {
+		if err = tlsConn.Handshake(); err != nil {
 			return nil, err
 		}
 		conn = tlsConn

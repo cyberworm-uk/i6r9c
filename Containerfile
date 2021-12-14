@@ -13,7 +13,7 @@ RUN go build -o irc .
 
 FROM docker.io/library/alpine:latest
 RUN apk -U upgrade --no-cache
-RUN apk add ca-certificates tzdata
+RUN apk add ca-certificates tzdata --no-cache
 COPY --from=build /go/src/cmd/irc /irc
 USER 1000
 ENTRYPOINT [ "/irc" ]

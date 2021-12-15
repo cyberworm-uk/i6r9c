@@ -1,6 +1,7 @@
 package connection
 
 import (
+	"crypto/rand"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -31,7 +32,15 @@ func Connect(proxyAddr, serverAddr *string, clientAuthCert *tls.Certificate, tls
 	if err != nil {
 		return nil, err
 	}
-	auth := &proxy.Auth{User: "420", Password: "69"} // circuit isolation
+	// sorry, if you're not using Tor this is probably inconvenient.
+	// however this client is designed for use with Tor.
+	// this ensures that circuits are isolated, I.E. two distinct IRC connection won't use the same Tor circuit (linking them together).
+	var blob [16]byte
+	rand.Read(blob[:])
+	var user = fmt.Sprintf("%x", blob[:])
+	rand.Read(blob[:])
+	var passwd = fmt.Sprintf("%x", blob[:])
+	auth := &proxy.Auth{User: user, Password: passwd} // circuit isolation
 	dialer, err := proxy.SOCKS5("tcp", proxyUrl.Hostname()+":"+proxyUrl.Port(), auth, new(net.Dialer))
 	if err != nil {
 		return nil, err

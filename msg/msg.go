@@ -10,6 +10,7 @@ func InternalError(err error) *Msg {
 		nick:    "internal",
 		user:    "internal",
 		host:    "localhost",
+		cmd:     "ERROR",
 		content: err.Error(),
 	}
 }

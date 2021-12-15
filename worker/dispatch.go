@@ -20,6 +20,7 @@ func Worker(conn net.Conn, wg *sync.WaitGroup) (<-chan *msg.Msg, chan<- string, 
 		for {
 			line, err := rd.ReadString('\n')
 			if err != nil {
+				toCaller <- msg.InternalError(err)
 				close(stopWorker)
 				return
 			}
@@ -47,6 +48,7 @@ func Worker(conn net.Conn, wg *sync.WaitGroup) (<-chan *msg.Msg, chan<- string, 
 			case line := <-fromCaller:
 				_, err := conn.Write([]byte(line + "\n"))
 				if err != nil {
+					toCaller <- msg.InternalError(err)
 					close(stopWorker)
 					return
 				}

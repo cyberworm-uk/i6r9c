@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+func InternalError(err error) *Msg {
+	return &Msg{
+		nick:    "internal",
+		user:    "internal",
+		host:    "localhost",
+		content: err.Error(),
+	}
+}
+
 // Msg is a structure which represents a single message received from an IRCd
 type Msg struct {
 	timestamp, nick, user, host, cmd, rcpt, content, args string

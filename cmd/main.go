@@ -221,10 +221,11 @@ func main() {
 	go func() {
 		for {
 			if line, err := t.ReadLine(); err != nil {
-				lineChan <- line
-			} else {
+				printMsg(t, msg.InternalError(err))
 				close(stop)
 				return
+			} else {
+				lineChan <- line
 			}
 		}
 	}()

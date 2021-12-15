@@ -9,7 +9,7 @@ ENV CGO_ENABLED=0
 WORKDIR /go/src
 RUN go mod download
 WORKDIR /go/src/cmd
-RUN go build -o irc .
+RUN go build -o irc -ldflags '-extldflags "-static" -w -s' .
 
 FROM docker.io/library/alpine:latest
 RUN apk -U upgrade --no-cache

@@ -6,9 +6,8 @@ RUN git clone --depth=1 --branch=${VERSION} https://github.com/guest42069/i6r9c/
 FROM docker.io/library/golang:1.17-alpine AS build
 COPY --from=source /go/src /go/src
 ENV CGO_ENABLED=0
-WORKDIR /go/src
-RUN go mod download
 WORKDIR /go/src/cmd
+RUN go mod download
 RUN go build -o irc -ldflags '-extldflags "-static" -w -s' .
 
 FROM docker.io/library/alpine:latest

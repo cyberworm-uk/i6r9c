@@ -43,7 +43,7 @@ func Connect(proxyAddr, serverAddr *string, clientAuthCert *tls.Certificate, tls
 	if serverUrl.Scheme == "ircs" {
 		cfg := &tls.Config{
 			ServerName:         serverUrl.Hostname(),
-			InsecureSkipVerify: tlsVerify,
+			InsecureSkipVerify: !tlsVerify,
 		}
 		if clientAuthCert != nil {
 			cfg.Certificates = append(cfg.Certificates, *clientAuthCert)

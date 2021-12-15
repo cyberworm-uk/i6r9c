@@ -153,6 +153,7 @@ func main() {
 	proxyPtr := flag.String("proxy", "socks5://127.0.0.1:9050/", "URL schema of proxy, [scheme]://[server]:[port].")
 	nickPtr := flag.String("nick", "", "IRC nickname to use.")
 	saslPtr := flag.String("sasl", "", "SASL cert and key prefix (I.E foo/bar for foo/bar.crt and foo/bar.key)")
+	verifyPtr := flag.Bool("verify", true, "Verify TLS certificates (I.E. an .onion with TLS but no valid cert.)")
 	flag.Parse()
 	if len(*nickPtr) < 1 {
 		nickPtr = randomName()
@@ -165,13 +166,13 @@ func main() {
 			fmt.Printf("ERROR: %s\n", err)
 			return
 		}
-		conn, err = connection.Connect(proxyPtr, serverPtr, &cert, true)
+		conn, err = connection.Connect(proxyPtr, serverPtr, &cert, *verifyPtr)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 			return
 		}
 	} else {
-		conn, err = connection.Connect(proxyPtr, serverPtr, nil, true)
+		conn, err = connection.Connect(proxyPtr, serverPtr, nil, *verifyPtr)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 			return
@@ -218,11 +219,13 @@ func main() {
 	}()
 	lineChan := make(chan string)
 	go func() {
-		if line, err := t.ReadLine(); err != nil {
-			lineChan <- line
-		} else {
-			close(stop)
-			return
+		for {
+			if line, err := t.ReadLine(); err != nil {
+				lineChan <- line
+			} else {
+				close(stop)
+				return
+			}
 		}
 	}()
 	var current string = ""

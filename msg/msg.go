@@ -7,11 +7,13 @@ import (
 
 func InternalError(err error) *Msg {
 	return &Msg{
-		nick:    "internal",
-		user:    "internal",
-		host:    "localhost",
-		cmd:     "ERROR",
-		content: err.Error(),
+		timestamp: time.Now().Format("15:04:05"),
+		rcpt:      "localhost",
+		nick:      "internal",
+		user:      "internal",
+		host:      "localhost",
+		cmd:       "ERROR",
+		content:   err.Error(),
 	}
 }
 

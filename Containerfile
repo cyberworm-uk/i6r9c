@@ -5,14 +5,17 @@ RUN git clone --depth=1 --branch=${VERSION} https://github.com/guest42069/i6r9c/
 
 FROM docker.io/library/golang:1.17-alpine AS build
 COPY --from=source /go/src /go/src
-ENV CGO_ENABLED=0
 WORKDIR /go/src/cmd
 RUN go mod download
-RUN go build -o irc -ldflags '-extldflags "-static" -w -s' .
+RUN CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -w -s -buildid=' -trimpath .
 
-FROM docker.io/library/alpine:latest
+FROM docker.io/library/alpine:latest AS files
 RUN apk -U upgrade --no-cache
 RUN apk add ca-certificates tzdata --no-cache
-COPY --from=build /go/src/cmd/irc /irc
+
+FROM scratch
+COPY --from=files /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=files /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=build /go/src/cmd/cmd /i6r9c
 USER 1000
-ENTRYPOINT [ "/irc" ]
+ENTRYPOINT [ "/i6r9c" ]

@@ -84,4 +84,13 @@ $ podman run -it --rm ghcr.io/guest42069/i6r9c:latest
 #oftc>
 ```
 
-this client is intentionally minimalist.
+example usage with sasl certfp, e.g. [with OFTC NickServ CertFP](https://www.oftc.net/NickServ/CertFP/)
+
+```bash
+mkdir sasl && cd sasl
+openssl req -nodes -newkey rsa:2048 -keyout certfp.key -x509 -days 3650 -out certfp.crt
+cd ..
+podman pod create --name torpod
+podman run --pod torpod -d --rm ghcr.io/guest42069/arti:latest
+podman run --pod torpod -it --rm -v $(pwd)/sasl:/sasl:ro ghcr.io/guest42069/i6r9c:latest -nick nick -sasl /sasl/certfp
+```

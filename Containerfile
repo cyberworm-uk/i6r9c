@@ -3,7 +3,7 @@ ARG VERSION=main
 WORKDIR /go/src
 RUN git clone --depth=1 --branch=${VERSION} https://github.com/guest42069/i6r9c/ .
 
-FROM docker.io/library/golang:1.19-alpine AS build
+FROM docker.io/library/golang:1.20-alpine AS build
 COPY --from=source /go/src /go/src
 WORKDIR /go/src/cmd
 RUN go mod download

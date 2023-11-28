@@ -12,9 +12,9 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/guest42069/i6r9c/connection"
-	"github.com/guest42069/i6r9c/msg"
-	"github.com/guest42069/i6r9c/worker"
+	"github.com/cyberworm-uk/i6r9c/connection"
+	"github.com/cyberworm-uk/i6r9c/msg"
+	"github.com/cyberworm-uk/i6r9c/worker"
 	"golang.org/x/term"
 )
 

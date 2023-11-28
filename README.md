@@ -4,9 +4,9 @@ basic terminal irc client in go, intended for use with tor.
 e.g.
 
 ```
-$ go install github.com/guest42069/i6r9c/cmd@main
+$ go install github.com/cyberworm-uk/i6r9c/cmd@main
 $ ~/go/bin/cmd -h
-Usage of /home/guest42069/go/bin/cmd:
+Usage of /home/cyberworm-uk/go/bin/cmd:
   -nick string
     	IRC nickname to use.
   -proxy string
@@ -22,7 +22,7 @@ Usage of /home/guest42069/go/bin/cmd:
 alternatively, as a container
 
 ```
-$ podman run --rm -it ghcr.io/guest42069/i6r9c -h
+$ podman run --rm -it ghcr.io/cyberworm-uk/i6r9c -h
 Usage of /irc:
   -nick string
     	IRC nickname to use.
@@ -60,7 +60,7 @@ only the container file is needed for the build, as it will handle fetching the 
 Usage of the client (see: `/help`):
 
 ```
-$ podman run -it --rm ghcr.io/guest42069/i6r9c:latest
+$ podman run -it --rm ghcr.io/cyberworm-uk/i6r9c:latest
 [01:25:48] [kinetic.oftc.net@AUTH] *** Looking up your hostname... []
 [01:25:48] [kinetic.oftc.net@AUTH] *** Checking Ident []
 [01:25:48] [kinetic.oftc.net@AUTH] *** Couldn't look up your hostname []
@@ -91,6 +91,6 @@ mkdir sasl && cd sasl
 openssl req -nodes -newkey rsa:2048 -keyout certfp.key -x509 -days 3650 -out certfp.crt
 cd ..
 podman pod create --name torpod
-podman run --pod torpod -d --rm ghcr.io/guest42069/arti:latest
-podman run --pod torpod -it --rm -v $(pwd)/sasl:/sasl:ro ghcr.io/guest42069/i6r9c:latest -nick nick -sasl /sasl/certfp
+podman run --pod torpod -d --rm ghcr.io/cyberworm-uk/arti:latest
+podman run --pod torpod -it --rm -v $(pwd)/sasl:/sasl:ro ghcr.io/cyberworm-uk/i6r9c:latest -nick nick -sasl /sasl/certfp
 ```

@@ -1,4 +1,4 @@
-module github.com/guest42069/i6r9c
+module github.com/cyberworm-uk/i6r9c
 
 go 1.21.3
 

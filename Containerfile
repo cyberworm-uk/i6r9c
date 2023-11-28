@@ -1,7 +1,7 @@
 FROM --platform=$BUILDPLATFORM docker.io/alpine/git:latest AS source
 ARG VERSION=main
 WORKDIR /go/src
-RUN git clone --depth=1 --branch=${VERSION} https://github.com/guest42069/i6r9c/ .
+RUN git clone --depth=1 --branch=${VERSION} https://github.com/cyberworm-uk/i6r9c/ .
 
 FROM --platform=$BUILDPLATFORM docker.io/library/golang:alpine AS build
 ARG TARGETOS TARGETARCH

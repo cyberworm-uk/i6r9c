@@ -11,7 +11,7 @@ WORKDIR /go/src/cmd
 RUN --mount=type=cache,target=/go/pkg go mod download
 RUN --mount=type=cache,target=/go/pkg --mount=type=cache,target=/root/.cache/go-build go build -ldflags '-w -s -buildid=' .
 
-FROM docker.io/library/alpine:latest
+FROM ghcr.io/cyberworm-uk/base:latest
 RUN apk add ca-certificates tzdata --no-cache
 COPY --from=build /go/src/cmd/cmd /i6r9c
 USER 1000

@@ -15,6 +15,7 @@ import (
 	"github.com/cyberworm-uk/i6r9c/connection"
 	"github.com/cyberworm-uk/i6r9c/msg"
 	"github.com/cyberworm-uk/i6r9c/worker"
+	"github.com/docker/docker/pkg/namesgenerator"
 	"golang.org/x/term"
 )
 
@@ -151,13 +152,10 @@ func main() {
 	defer wg.Wait()
 	serverPtr := flag.String("server", "ircs://irc.oftc.net:6697/", "URL schema of server, [scheme]://[server]:[port]. irc for non-TLS, ircs for TLS.")
 	proxyPtr := flag.String("proxy", "socks5://127.0.0.1:9050/", "URL schema of proxy, [scheme]://[server]:[port].")
-	nickPtr := flag.String("nick", "", "IRC nickname to use.")
+	nickPtr := flag.String("nick", namesgenerator.GetRandomName(0), "IRC nickname to use.")
 	saslPtr := flag.String("sasl", "", "SASL cert and key prefix (I.E foo/bar for foo/bar.crt and foo/bar.key)")
 	verifyPtr := flag.Bool("verify", true, "Verify TLS certificates (I.E. an .onion with TLS but no valid cert.)")
 	flag.Parse()
-	if len(*nickPtr) < 1 {
-		nickPtr = randomName()
-	}
 	var conn net.Conn
 	var err error
 	if len(*saslPtr) > 0 {

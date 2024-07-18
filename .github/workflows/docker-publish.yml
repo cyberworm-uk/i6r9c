@@ -1,8 +1,6 @@
 name: Docker Image (i6r9c)
 
 on:
-  schedule:
-    - cron: '30 00 * * 5'
   workflow_dispatch:
 
 env:

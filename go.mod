@@ -1,11 +1,11 @@
 module github.com/cyberworm-uk/i6r9c
 
-go 1.21.6
+go 1.22.3
 
 require (
-	github.com/docker/docker v26.1.3+incompatible
-	golang.org/x/net v0.25.0
-	golang.org/x/term v0.20.0
+	github.com/docker/docker latest
+	golang.org/x/net latest
+	golang.org/x/term latest
 )
 
-require golang.org/x/sys v0.20.0 // indirect
+require golang.org/x/sys latest // indirect

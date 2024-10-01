@@ -1,9 +1,5 @@
 name: Docker Image (i6r9c)
 
-permissions:
-  id-token: write
-  attestations: write
-
 on:
   workflow_dispatch:
 
@@ -12,6 +8,12 @@ env:
 
 jobs:
   ghcr_publish:
+    permissions:
+      id-token: write
+      packages: write
+      contents: read
+      attestations: write
+
     runs-on: ubuntu-latest
     steps:
       - name: checkout

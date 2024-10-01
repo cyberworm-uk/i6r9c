@@ -1,5 +1,9 @@
 name: Docker Image (i6r9c)
 
+permissions:
+  id-token: write
+  attestations: write
+
 on:
   workflow_dispatch:
 
